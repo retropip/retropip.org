@@ -10,6 +10,7 @@
       buildInputs = with pkgs; [
         entr
         gnumake
+        wrangler
       ];
     };
 
