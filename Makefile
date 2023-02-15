@@ -1,5 +1,6 @@
 .PHONY: deploy build
 
 build:
-	cp -Rvf src/functions build/functions
+	mkdir -p build/functions
+	cp -Rvf functions/* build/functions
 
