@@ -22,9 +22,9 @@ function parseIso(dt) {
  */
 export async function onRequestGet(context) {
   const cutoff = Date(`${context.param.year}-${context.param.month}-${context.param.day}`);
-  const pythonpackageIndex = await fetch(JSON_URL.replace('{package}', context.param.package)).then(response => response.json());
+  const packageIndex = await fetch(JSON_URL.replace('{pythonpackage}', context.param.package)).then(response => response.json());
   let releaseLinks = '';
-  for (const release of Object.values(pythonpackageIndex.releases)) {
+  for (const release of Object.values(packageIndex.releases)) {
     for (const file of release) {
       const releaseDate = parseIso(file.upload_time);
       if (releaseDate < cutoff) {
@@ -37,5 +37,5 @@ export async function onRequestGet(context) {
       }
     }
   }
-  return new Response(PACKAGE_HTML.replace('{pythonpackage}', package).replace('{links}', releaseLinks));
+  return new Response(PACKAGE_HTML.replace('{pythonpackage}', context.param.package).replace('{links}', releaseLinks));
 }
