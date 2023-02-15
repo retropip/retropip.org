@@ -1,6 +1,7 @@
 .PHONY: build
 
 build:
-	mkdir -p build
-	echo '<pre>Hello world!</pre>' > build/index.html
-	ln -s index.html build/index2.html
+	mkdir -p build/2023/02/05
+	mkdir -p build/2023/02/05/environconfig
+	wget -O build/2023/02/05/index.html https://pypi.org/simple
+	wget -O build/2023/02/05/environconfig/index.html https://pypi.org/simple/environconfig/
