@@ -1,9 +1,10 @@
 .PHONY: deploy install build
 
 
-deploy:
-	make install
-	./nix-portable make build
+deploy: install
+	./nix-portable nix develop -c spago test
+	./nix-portable nix develop -c spago bundle-module
+	mv index.js build/functions/
 
 install:
 	curl --output nix-portable https://github.com/DavHau/nix-portable/releases/download/v009/nix-portable
