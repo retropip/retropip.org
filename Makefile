@@ -1,9 +1,13 @@
-.PHONY: build
+.PHONY: deploy install build
+
+
+deploy: install build
+
+install:
+	curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
 build:
-	mkdir -p build/functions
-	npm install purescript spago esbuild
-	spago test
-	spago bundle-module
+	nix develop -c spago test
+	nix develop -c spago bundle-module
 	mv index.js build/functions/
 
