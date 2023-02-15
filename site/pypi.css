@@ -1,0 +1,190 @@
+/*
+Style information specific to the PyPI web interface.
+
+$id$
+*/
+p.ok {
+  background-color: #22bb22;
+  padding: 5 5 5 5;
+  color: white;
+  font-weight: bold;
+}
+p.error {
+  background-color: #bb2222;
+  padding: 5 5 5 5;
+  color: white;
+  font-weight: bold;
+}
+
+/* style for forms */
+table.form {
+  padding: 2;
+  border-spacing: 0px;
+  border-collapse: separate;
+}
+
+table.form th {
+  color: #333388;
+  text-align: right;
+  vertical-align: top;
+  font-weight: normal;
+}
+
+table.form th.header {
+  font-weight: bold;
+  text-align: left;
+}
+
+table.form th.required {
+  font-weight: bold;
+}
+
+table.form td {
+  color: #333333;
+  empty-cells: show;
+  vertical-align: top;
+}
+
+table.form td.optional {
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* style for lists */
+table.list {
+  border-spacing: 0px;
+  border-collapse: separate;
+  width: 100%;
+}
+
+table.list th {
+  text-align: left;
+  padding: 0 4 0 4;
+  color: #404070;
+  border-bottom: 1px solid #404070;
+  vertical-align: top;
+  empty-cells: show;
+}
+table.list th a[href]:hover { color: #404070 }
+table.list th a[href]:link { color: #404070 }
+table.list th a[href] { color: #404070 }
+table.list th.group {
+  background-color: #f4f4ff;
+  text-align: center;
+}
+
+table.list td {
+  padding: 0 4 0 4;
+  border: 0 2 0 2;
+  border-right: 1px solid #404070;
+  color: #404070;
+  background-color: white;
+  vertical-align: top;
+  empty-cells: show;
+}
+
+table.list tr.normal td {
+  background-color: white;
+}
+
+table.list tr.alt td {
+  background-color: #efefef;
+}
+
+table.list td#last {
+  border-top: 1px solid #404070;
+  border-left: none;
+  border-right: none;
+}
+
+table.list td:first-child {
+  border-left: 1px solid #404070;
+  border-right: 1px solid #404070;
+}
+
+table.list tr.navigation th {
+  text-align: right;
+}
+table.list tr.navigation th:first-child {
+  border-right: none;
+  text-align: left;
+}
+
+/* style for role lists */
+table.roles {
+  border-spacing: 0px;
+  border-collapse: separate;
+  width: 100%;
+}
+
+table.roles th.header{
+  padding-top: 10px;
+  border-bottom: 1px solid gray;
+  font-weight: bold;
+  background-color: white;
+  color: #707040;
+}
+
+table.roles th {
+  border-bottom: 1px solid #afafaf;
+  font-weight: bold;
+  text-align: left;
+}
+
+table.roles td {
+  vertical-align: top;
+  empty-cells: show;
+}
+
+
+/* style for history displays */
+table.history {
+  border-spacing: 0px;
+  border-collapse: separate;
+  width: 100%;
+}
+
+table.history th.header{
+  padding-top: 10px;
+  border-bottom: 1px solid gray;
+  font-weight: bold;
+  background-color: white;
+  color: #707040;
+  font-size: 100%;
+}
+
+table.history th {
+  border-bottom: 1px solid #afafaf;
+  font-weight: bold;
+  text-align: left;
+  font-size: 90%;
+}
+
+table.history td {
+  font-size: 90%;
+  vertical-align: top;
+  empty-cells: show;
+}
+
+
+/*
+     FILE ARCHIVED ON 15:51:16 Aug 02, 2003 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 20:32:38 Feb 15, 2023.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 112.297
+  exclusion.robots: 0.105
+  exclusion.robots.policy: 0.094
+  cdx.remote: 0.079
+  esindex: 0.01
+  LoadShardBlock: 84.549 (3)
+  PetaboxLoader3.datanode: 85.018 (4)
+  CDXLines.iter: 17.506 (3)
+  load_resource: 92.84
+  PetaboxLoader3.resolve: 26.328
+*/

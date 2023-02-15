@@ -1,0 +1,29 @@
+/*
+ * Stylesheet for python.org.  This is (mostly) empty for now, since
+ * not all of the site actually references it.  Styles can be added
+ * once more of the HTML on the site includes the relevant <link>
+ * element.
+ *
+ * Documentation for the named classes will be made available at
+ * http://www.python.org/dev/pydotorg/ once this isn't an empty
+ * stylesheet.
+ */
+
+/* This avoids the white border around the page in MSIE. */
+html                 { border: 0px;
+                       margin: 0px;
+                       padding: 0px; }
+
+.continuation        { margin-left: 1em;
+                       margin-right: 1em; }
+
+.body h1, .body h2,
+.body h3, .body h4,
+.body h5, .body h6   { font-family: avantgarde, sans-serif;
+                       font-weight: bold; }
+
+.body h1             { font-size: 180%; }
+.body h2             { font-size: 150%; }
+.body h3, .body h4   { font-size: 120%; }
+
+td.body              { padding-bottom: 1em; }
