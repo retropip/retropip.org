@@ -8,7 +8,10 @@ export async function onRequestGet(context) {
     let headers = new Headers({
         'Content-Type': 'text/html'
     });
-    return new Response(await response.text(), { headers });
+    let content = await response.text();
+    // Replace all instances of href="/simple/..." prepending the year, month and day parts inside context.
+    let newContent = content.replace(/href="(\/simple\/[^\/]*)"/g, `href="${context.params.year}/${context.params.month}/${context.params.day}/$1"`);
+    return new Response(newContent, { headers });
   }
 }
 
