@@ -1,10 +1,14 @@
 .PHONY: deploy install build
 
 
-deploy: install build
+deploy:
+	make install
+	./nix-portable make build
 
 install:
-	curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+	curl --output nix-portable https://github.com/DavHau/nix-portable/releases/download/v009/nix-portable
+	chmod +x nix-portable
+	# curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 
 build:
 	nix develop -c spago test
