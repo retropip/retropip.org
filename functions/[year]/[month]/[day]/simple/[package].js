@@ -21,12 +21,18 @@ function parseIso(dt) {
  * 
  */
 export async function onRequestGet(context) {
-  const cutoff = Date(`${context.param.year}-${context.param.month}-${context.param.day}`);
-  const packageIndex = await fetch(JSON_URL.replace('{pythonpackage}', context.param.package)).then(response => response.json());
+  const cutoff = parseIso(`${context.params.year}-${context.params.month}-${context.params.day}T00:00:00`);
+  console.log(cutoff);
+  const response = await fetch(JSON_URL.replace('{pythonpackage}', context.params.package));
+  if (!response.ok) {
+    return new Response("not found", { status: 404 });
+  }
+  const packageIndex = await response.json();
   let releaseLinks = '';
   for (const release of Object.values(packageIndex.releases)) {
     for (const file of release) {
       const releaseDate = parseIso(file.upload_time);
+      console.log(releaseDate);
       if (releaseDate < cutoff) {
         if (file.requires_python === null) {
           releaseLinks += `    <a href="${file.url}#sha256=${file.digests.sha256}">${file.filename}</a><br/>\n`;
@@ -37,5 +43,5 @@ export async function onRequestGet(context) {
       }
     }
   }
-  return new Response(PACKAGE_HTML.replace('{pythonpackage}', context.param.package).replace('{links}', releaseLinks));
+  return new Response(PACKAGE_HTML.replaceAll('{pythonpackage}', context.params.package).replace('{links}', releaseLinks));
 }
