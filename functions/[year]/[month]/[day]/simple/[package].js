@@ -1,13 +1,13 @@
-const JSON_URL = 'https://pypi.org/pypi/{package}/json';
+const JSON_URL = 'https://pypi.org/pypi/{pythonpackage}/json';
 
 const PACKAGE_HTML = `
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Links for {package}</title>
+    <title>Links for {pythonpackage}</title>
   </head>
   <body>
-    <h1>Links for {package}</h1>
+    <h1>Links for {pythonpackage}</h1>
 {links}
   </body>
 </html>
@@ -22,9 +22,9 @@ function parseIso(dt) {
  */
 export async function onRequestGet(context) {
   const cutoff = Date(`${context.param.year}-${context.param.month}-${context.param.day}`);
-  const packageIndex = await fetch(JSON_URL.replace('{package}', context.param.package)).then(response => response.json());
+  const pythonpackageIndex = await fetch(JSON_URL.replace('{package}', context.param.package)).then(response => response.json());
   let releaseLinks = '';
-  for (const release of Object.values(packageIndex.releases)) {
+  for (const release of Object.values(pythonpackageIndex.releases)) {
     for (const file of release) {
       const releaseDate = parseIso(file.upload_time);
       if (releaseDate < cutoff) {
@@ -37,5 +37,5 @@ export async function onRequestGet(context) {
       }
     }
   }
-  return new Response(PACKAGE_HTML.replace('{package}', package).replace('{links}', releaseLinks));
+  return new Response(PACKAGE_HTML.replace('{pythonpackage}', package).replace('{links}', releaseLinks));
 }
