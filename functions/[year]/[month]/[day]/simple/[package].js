@@ -43,5 +43,8 @@ export async function onRequestGet(context) {
       }
     }
   }
-  return new Response(PACKAGE_HTML.replaceAll('{pythonpackage}', context.params.package).replace('{links}', releaseLinks));
+  let headers = new Headers({
+      'Content-Type': 'text/html'
+  });
+  return new Response(PACKAGE_HTML.replaceAll('{pythonpackage}', context.params.package).replace('{links}', releaseLinks), { headers });
 }
