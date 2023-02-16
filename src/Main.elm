@@ -8,6 +8,7 @@ import Html.Attributes as Attr
 import Html.Events exposing (onInput)
 import String.Format
 import Task
+import Maybe.Extra as ME
 
 firstPackageDate : Date
 firstPackageDate = fromCalendarDate 2005 Apr 18
@@ -16,7 +17,7 @@ type alias PythonVersion = (Int, Int, Int)
 
 type alias Model =
   { date : Result String Date
-  , version : Maybe PythonVersion
+  , distribution : Maybe Distribution
   , today : Date
   }
 
@@ -34,6 +35,127 @@ type alias Distribution =
   , dockerImage : Maybe String
   , pyenvAvailable : Bool
   }
+
+
+-- -- from podman search `podman search library/python --list-tags --no-trunc --limit 10000`
+-- Just "docker.io/library/python:2.7.10"
+-- Just "docker.io/library/python:2.7.11"
+-- Just "docker.io/library/python:2.7.12"
+-- Just "docker.io/library/python:2.7.13"
+-- Just "docker.io/library/python:2.7.14"
+-- Just "docker.io/library/python:2.7.15"
+-- Just "docker.io/library/python:2.7.16"
+-- Just "docker.io/library/python:2.7.17"
+-- Just "docker.io/library/python:2.7.18"
+-- Just "docker.io/library/python:2.7.7"
+-- Just "docker.io/library/python:2.7.8"
+-- Just "docker.io/library/python:2.7.9"
+-- Just "docker.io/library/python:3.10.0"
+-- Just "docker.io/library/python:3.10.1"
+-- Just "docker.io/library/python:3.10.10"
+-- Just "docker.io/library/python:3.10.2"
+-- Just "docker.io/library/python:3.10.3"
+-- Just "docker.io/library/python:3.10.4"
+-- Just "docker.io/library/python:3.10.5"
+-- Just "docker.io/library/python:3.10.6"
+-- Just "docker.io/library/python:3.10.7"
+-- Just "docker.io/library/python:3.10.8"
+-- Just "docker.io/library/python:3.10.9"
+-- Just "docker.io/library/python:3.11.0"
+-- Just "docker.io/library/python:3.11.1"
+-- Just "docker.io/library/python:3.11.2"
+-- Just "docker.io/library/python:3.2.6"
+-- Just "docker.io/library/python:3.3.5"
+-- Just "docker.io/library/python:3.3.6"
+-- Just "docker.io/library/python:3.3.7"
+-- Just "docker.io/library/python:3.4.1"
+-- Just "docker.io/library/python:3.4.10"
+-- Just "docker.io/library/python:3.4.2"
+-- Just "docker.io/library/python:3.4.3"
+-- Just "docker.io/library/python:3.4.4"
+-- Just "docker.io/library/python:3.4.5"
+-- Just "docker.io/library/python:3.4.6"
+-- Just "docker.io/library/python:3.4.7"
+-- Just "docker.io/library/python:3.4.8"
+-- Just "docker.io/library/python:3.4.9"
+-- Just "docker.io/library/python:3.5.0"
+-- Just "docker.io/library/python:3.5.1"
+-- Just "docker.io/library/python:3.5.10"
+-- Just "docker.io/library/python:3.5.2"
+-- Just "docker.io/library/python:3.5.3"
+-- Just "docker.io/library/python:3.5.4"
+-- Just "docker.io/library/python:3.5.5"
+-- Just "docker.io/library/python:3.5.6"
+-- Just "docker.io/library/python:3.5.7"
+-- Just "docker.io/library/python:3.5.8"
+-- Just "docker.io/library/python:3.5.9"
+-- Just "docker.io/library/python:3.6.0"
+-- Just "docker.io/library/python:3.6.1"
+-- Just "docker.io/library/python:3.6.10"
+-- Just "docker.io/library/python:3.6.11"
+-- Just "docker.io/library/python:3.6.12"
+-- Just "docker.io/library/python:3.6.13"
+-- Just "docker.io/library/python:3.6.14"
+-- Just "docker.io/library/python:3.6.15"
+-- Just "docker.io/library/python:3.6.2"
+-- Just "docker.io/library/python:3.6.3"
+-- Just "docker.io/library/python:3.6.4"
+-- Just "docker.io/library/python:3.6.5"
+-- Just "docker.io/library/python:3.6.6"
+-- Just "docker.io/library/python:3.6.7"
+-- Just "docker.io/library/python:3.6.8"
+-- Just "docker.io/library/python:3.6.9"
+-- Just "docker.io/library/python:3.7.0"
+-- Just "docker.io/library/python:3.7.1"
+-- Just "docker.io/library/python:3.7.10"
+-- Just "docker.io/library/python:3.7.11"
+-- Just "docker.io/library/python:3.7.12"
+-- Just "docker.io/library/python:3.7.13"
+-- Just "docker.io/library/python:3.7.14"
+-- Just "docker.io/library/python:3.7.15"
+-- Just "docker.io/library/python:3.7.16"
+-- Just "docker.io/library/python:3.7.2"
+-- Just "docker.io/library/python:3.7.3"
+-- Just "docker.io/library/python:3.7.4"
+-- Just "docker.io/library/python:3.7.5"
+-- Just "docker.io/library/python:3.7.6"
+-- Just "docker.io/library/python:3.7.7"
+-- Just "docker.io/library/python:3.7.8"
+-- Just "docker.io/library/python:3.7.9"
+-- Just "docker.io/library/python:3.8.0"
+-- Just "docker.io/library/python:3.8.1"
+-- Just "docker.io/library/python:3.8.10"
+-- Just "docker.io/library/python:3.8.11"
+-- Just "docker.io/library/python:3.8.12"
+-- Just "docker.io/library/python:3.8.13"
+-- Just "docker.io/library/python:3.8.14"
+-- Just "docker.io/library/python:3.8.15"
+-- Just "docker.io/library/python:3.8.16"
+-- Just "docker.io/library/python:3.8.2"
+-- Just "docker.io/library/python:3.8.3"
+-- Just "docker.io/library/python:3.8.4"
+-- Just "docker.io/library/python:3.8.5"
+-- Just "docker.io/library/python:3.8.6"
+-- Just "docker.io/library/python:3.8.7"
+-- Just "docker.io/library/python:3.8.8"
+-- Just "docker.io/library/python:3.8.9"
+-- Just "docker.io/library/python:3.9.0"
+-- Just "docker.io/library/python:3.9.1"
+-- Just "docker.io/library/python:3.9.10"
+-- Just "docker.io/library/python:3.9.11"
+-- Just "docker.io/library/python:3.9.12"
+-- Just "docker.io/library/python:3.9.13"
+-- Just "docker.io/library/python:3.9.14"
+-- Just "docker.io/library/python:3.9.15"
+-- Just "docker.io/library/python:3.9.16"
+-- Just "docker.io/library/python:3.9.2"
+-- Just "docker.io/library/python:3.9.3"
+-- Just "docker.io/library/python:3.9.4"
+-- Just "docker.io/library/python:3.9.5"
+-- Just "docker.io/library/python:3.9.6"
+-- Just "docker.io/library/python:3.9.7"
+-- Just "docker.io/library/python:3.9.8"
+-- Just "docker.io/library/python:3.9.9"
 
 -- from https://en.wikipedia.org/wiki/History_of_Python
 distributions : List Distribution
@@ -53,26 +175,30 @@ distributions =
   , { interpreter = CPython, version = (2, 4,  0), latestMicroVersion = (2, 4,  6),  releaseDate = fromCalendarDate 2004 Nov 30, endOfSupport = fromCalendarDate 2008 Dec 19, dockerImage = Nothing, pyenvAvailable = False }
   , { interpreter = CPython, version = (2, 5,  0), latestMicroVersion = (2, 5,  6),  releaseDate = fromCalendarDate 2006 Sep 19, endOfSupport = fromCalendarDate 2011 May 26, dockerImage = Nothing, pyenvAvailable = False }
   , { interpreter = CPython, version = (2, 6,  0), latestMicroVersion = (2, 6,  9),  releaseDate = fromCalendarDate 2008 Oct  1, endOfSupport = fromCalendarDate 2010 Aug 24, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 7,  0), latestMicroVersion = (2, 7,  18), releaseDate = fromCalendarDate 2010 Jul  3, endOfSupport = fromCalendarDate 2020 Jan  1, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 7,  0), latestMicroVersion = (2, 7,  18), releaseDate = fromCalendarDate 2010 Jul  3, endOfSupport = fromCalendarDate 2020 Jan  1, dockerImage = Just "docker.io/library/python:2.7.18", pyenvAvailable = False }
   , { interpreter = CPython, version = (3, 0,  0), latestMicroVersion = (3, 0,  1),  releaseDate = fromCalendarDate 2008 Dec  3, endOfSupport = fromCalendarDate 2009 Jun 27, dockerImage = Nothing, pyenvAvailable = False }
   , { interpreter = CPython, version = (3, 1,  0), latestMicroVersion = (3, 1,  5),  releaseDate = fromCalendarDate 2009 Jun 27, endOfSupport = fromCalendarDate 2011 Jun 12, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 2,  0), latestMicroVersion = (3, 2,  6),  releaseDate = fromCalendarDate 2011 Feb 20, endOfSupport = fromCalendarDate 2013 May 13, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 3,  0), latestMicroVersion = (3, 3,  7),  releaseDate = fromCalendarDate 2012 Sep 29, endOfSupport = fromCalendarDate 2014 Mar  8, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 4,  0), latestMicroVersion = (3, 4,  10), releaseDate = fromCalendarDate 2014 Mar 16, endOfSupport = fromCalendarDate 2017 Aug  9, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 5,  0), latestMicroVersion = (3, 5,  10), releaseDate = fromCalendarDate 2015 Sep 13, endOfSupport = fromCalendarDate 2017 Aug  8, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 6,  0), latestMicroVersion = (3, 6,  15), releaseDate = fromCalendarDate 2016 Dec 23, endOfSupport = fromCalendarDate 2018 Dec 24, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 7,  0), latestMicroVersion = (3, 7,  16), releaseDate = fromCalendarDate 2018 Jun 27, endOfSupport = fromCalendarDate 2020 Jun 27, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 8,  0), latestMicroVersion = (3, 8,  16), releaseDate = fromCalendarDate 2019 Oct 14, endOfSupport = fromCalendarDate 2021 May  3, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 9,  0), latestMicroVersion = (3, 9,  16), releaseDate = fromCalendarDate 2020 Oct  5, endOfSupport = fromCalendarDate 2022 May 17, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 10, 0), latestMicroVersion = (3, 10, 10), releaseDate = fromCalendarDate 2021 Oct  4, endOfSupport = fromCalendarDate 2023 May  1, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 11, 0), latestMicroVersion = (3, 11, 2),  releaseDate = fromCalendarDate 2022 Oct 24, endOfSupport = fromCalendarDate 2024 May  1, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 2,  0), latestMicroVersion = (3, 2,  6),  releaseDate = fromCalendarDate 2011 Feb 20, endOfSupport = fromCalendarDate 2013 May 13, dockerImage = Just "docker.io/library/python:3.2.6", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 3,  0), latestMicroVersion = (3, 3,  7),  releaseDate = fromCalendarDate 2012 Sep 29, endOfSupport = fromCalendarDate 2014 Mar  8, dockerImage = Just "docker.io/library/python:3.3.7", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 4,  0), latestMicroVersion = (3, 4,  10), releaseDate = fromCalendarDate 2014 Mar 16, endOfSupport = fromCalendarDate 2017 Aug  9, dockerImage = Just "docker.io/library/python:3.4.10", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 5,  0), latestMicroVersion = (3, 5,  10), releaseDate = fromCalendarDate 2015 Sep 13, endOfSupport = fromCalendarDate 2017 Aug  8, dockerImage = Just "docker.io/library/python:3.5.10", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 6,  0), latestMicroVersion = (3, 6,  15), releaseDate = fromCalendarDate 2016 Dec 23, endOfSupport = fromCalendarDate 2018 Dec 24, dockerImage = Just "docker.io/library/python:3.6.15", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 7,  0), latestMicroVersion = (3, 7,  16), releaseDate = fromCalendarDate 2018 Jun 27, endOfSupport = fromCalendarDate 2020 Jun 27, dockerImage = Just "docker.io/library/python:3.7.16", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 8,  0), latestMicroVersion = (3, 8,  16), releaseDate = fromCalendarDate 2019 Oct 14, endOfSupport = fromCalendarDate 2021 May  3, dockerImage = Just "docker.io/library/python:3.8.16", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 9,  0), latestMicroVersion = (3, 9,  16), releaseDate = fromCalendarDate 2020 Oct  5, endOfSupport = fromCalendarDate 2022 May 17, dockerImage = Just "docker.io/library/python:3.9.16", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 10, 0), latestMicroVersion = (3, 10, 10), releaseDate = fromCalendarDate 2021 Oct  4, endOfSupport = fromCalendarDate 2023 May  1, dockerImage = Just "docker.io/library/python:3.10.10", pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 11, 0), latestMicroVersion = (3, 11, 2),  releaseDate = fromCalendarDate 2022 Oct 24, endOfSupport = fromCalendarDate 2024 May  1, dockerImage = Just "docker.io/library/python:3.11.2", pyenvAvailable = False }
   , { interpreter = CPython, version = (3, 12, 0), latestMicroVersion = (3, 12, 0),  releaseDate = fromCalendarDate 2023 Oct  2, endOfSupport = fromCalendarDate 2025 May  1, dockerImage = Nothing, pyenvAvailable = False }
   ]
+
+selectDistribution : String -> Maybe Distribution
+selectDistribution version =
+  List.foldr (\dist acc -> if versionToString dist.version == version then Just dist else acc) Nothing distributions
 
 initialModel : Model
 initialModel =
   { date = Err "No date selected"
-  , version = Just (2, 7, 0)
+  , distribution = Nothing
   , today = fromCalendarDate 2019 Jan 1
   }
 
@@ -82,6 +208,7 @@ main =
 
 type Msg = SetWorkingDate String
          | SetTodayDate Date
+         | SetDistribution String
 
 init : () -> (Model, Cmd Msg)
 init _ = (initialModel, Date.today |> Task.perform SetTodayDate)
@@ -93,6 +220,8 @@ update msg model =
       ({ model | date = fromIsoString d }, Cmd.none)
     SetTodayDate d ->
       ({ model | today = d }, Cmd.none)
+    SetDistribution version ->
+      ({ model | distribution = selectDistribution version }, Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions _ = Sub.none
@@ -110,11 +239,11 @@ versionToString version =
       |> String.Format.namedValue "minor" (String.fromInt minor)
       |> String.Format.namedValue "patch" (String.fromInt patch)
 
-dockerRecipe : Date -> PythonVersion -> Html Msg
-dockerRecipe date version =
+dockerRecipe : Date -> String -> Html Msg
+dockerRecipe date image =
   let
     template = """
-FROM python/{{ version }}
+FROM {{ image }}
 
 WORKDIR /usr/src/app
 
@@ -129,16 +258,19 @@ CMD [ "python", "./your-script.py" ]
   in
     pre [] [ text ( template
                       |> String.Format.namedValue "indexUrl" (toRetroPipUrl date)
-                      |> String.Format.namedValue "version" (versionToString version))
+                      |> String.Format.namedValue "image" image)
             ]
 
 viewRecipe : Model -> Html Msg
 viewRecipe model =
   let
-    { date, version } = model
+    { date, distribution } = model
   in
-    case (date, version) of
-      (Ok d, Just v) -> dockerRecipe d v
+    case (date, distribution) of
+      (Ok d, Just dist) ->
+        case dist.dockerImage of
+          Just image -> dockerRecipe d image
+          Nothing -> text ""
       _ -> text ""
 
 introMessage : Html Msg
@@ -173,10 +305,11 @@ workingDateSelector model =
 distributionOption : Model -> Distribution -> Html Msg
 distributionOption model dist =
   let
+    hasDocker = ME.isJust dist.dockerImage
     released = not <| LT == (Date.compare (Result.withDefault model.today model.date) dist.releaseDate)
     endOfLife = not <| LT == (Date.compare (Result.withDefault model.today model.date) dist.endOfSupport)
     version = versionToString dist.version
-    label = "{{ name }} {{ version }} {{ note }}"
+    label = "{{ name }} {{ version }} {{ note }} {{ docker }}"
       |> String.Format.namedValue "name" (interpreterToString dist.interpreter)
       |> String.Format.namedValue "version" version
       |> String.Format.namedValue "note" (
@@ -185,6 +318,7 @@ distributionOption model dist =
           (True, True) -> " - End of life"
           _ -> ""
       )
+      |> String.Format.namedValue "docker" (if hasDocker then "🐋" else "")
   in
     option [ Attr.value version ] [ text label ]
 
@@ -192,7 +326,7 @@ distributionSelector : Model -> Html Msg
 distributionSelector model =
   div []
     [ label [ Attr.for "pythonDistribution" ] [ text "Python version:" ]
-    , select [ ] (List.map (distributionOption model) distributions)
+    , select [ onInput SetDistribution ] (List.map (distributionOption model) distributions)
     ]
 
 view : Model -> Html Msg
