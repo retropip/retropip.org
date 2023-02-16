@@ -3,51 +3,70 @@ module Main exposing (..)
 import Browser
 import Date exposing (Date, fromIsoString, format, fromCalendarDate, toIsoString)
 import Time exposing (Month(..))
-import Html exposing (Html, div, text, h1, ol, li, h2, p, input, pre, label)
+import Html exposing (Html, div, text, h1, ol, li, h2, p, input, pre, label, select, option)
 import Html.Attributes as Attr
 import Html.Events exposing (onInput)
 import String.Format
 import Task
 
+firstPackageDate : Date
 firstPackageDate = fromCalendarDate 2005 Apr 18
 
-type alias PyVersion = (Int, Int, Int)
-type alias Model = { date : Result String Date
-                   , version : Maybe PyVersion
-                   , today : Date
-                   }
+type alias PythonVersion = (Int, Int, Int)
+
+type alias Model =
+  { date : Result String Date
+  , version : Maybe PythonVersion
+  , today : Date
+  }
+
+type PythonInterpreter = CPython
+
+interpreterToString : PythonInterpreter -> String
+interpreterToString _ = "CPython"
+
+type alias Distribution = 
+  { interpreter : PythonInterpreter
+  , version : PythonVersion
+  , latestMicroVersion : PythonVersion
+  , releaseDate : Date
+  , endOfSupport : Date
+  , dockerImage : Maybe String
+  , pyenvAvailable : Bool
+  }
 
 -- from https://en.wikipedia.org/wiki/History_of_Python
-pythonVersions =
-  [ { version = (0, 9,  0), latestMicroVersion = (0, 9,  9),  releaseDate = fromIsoString "1991-02-20", endOfSupport = fromIsoString "1993-07-29" }
-  , { version = (1, 0,  0), latestMicroVersion = (1, 0,  4),  releaseDate = fromIsoString "1994-01-26", endOfSupport = fromIsoString "1994-02-15" }
-  , { version = (1, 1,  0), latestMicroVersion = (1, 1,  1),  releaseDate = fromIsoString "1994-10-11", endOfSupport = fromIsoString "1994-11-10" }
-  , { version = (1, 2,  0), latestMicroVersion = (1, 2,  0),  releaseDate = fromIsoString "1995-04-13", endOfSupport = fromIsoString "1995-04-13" }
-  , { version = (1, 3,  0), latestMicroVersion = (1, 3,  0),  releaseDate = fromIsoString "1995-10-13", endOfSupport = fromIsoString "1995-10-13" }
-  , { version = (1, 4,  0), latestMicroVersion = (1, 4,  0),  releaseDate = fromIsoString "1996-10-25", endOfSupport = fromIsoString "1996-10-25" }
-  , { version = (1, 5,  0), latestMicroVersion = (1, 5,  2),  releaseDate = fromIsoString "1998-01-03", endOfSupport = fromIsoString "1999-04-13" }
-  , { version = (1, 6,  0), latestMicroVersion = (1, 6,  1),  releaseDate = fromIsoString "2000-09-05", endOfSupport = fromIsoString "2000-09-01" }
-  , { version = (2, 0,  0), latestMicroVersion = (2, 0,  1),  releaseDate = fromIsoString "2000-10-16", endOfSupport = fromIsoString "2001-06-22" }
-  , { version = (2, 1,  0), latestMicroVersion = (2, 1,  3),  releaseDate = fromIsoString "2001-04-15", endOfSupport = fromIsoString "2002-04-09" }
-  , { version = (2, 2,  0), latestMicroVersion = (2, 2,  3),  releaseDate = fromIsoString "2001-12-21", endOfSupport = fromIsoString "2003-05-30" }
-  , { version = (2, 3,  0), latestMicroVersion = (2, 3,  7),  releaseDate = fromIsoString "2003-06-29", endOfSupport = fromIsoString "2008-03-11" }
-  , { version = (2, 4,  0), latestMicroVersion = (2, 4,  6),  releaseDate = fromIsoString "2004-11-30", endOfSupport = fromIsoString "2008-12-19" }
-  , { version = (2, 5,  0), latestMicroVersion = (2, 5,  6),  releaseDate = fromIsoString "2006-09-19", endOfSupport = fromIsoString "2011-05-26" }
-  , { version = (2, 6,  0), latestMicroVersion = (2, 6,  9),  releaseDate = fromIsoString "2008-10-01", endOfSupport = fromIsoString "2010-08-24" }
-  , { version = (2, 7,  0), latestMicroVersion = (2, 7,  18), releaseDate = fromIsoString "2010-07-03", endOfSupport = fromIsoString "2020-01-01" }
-  , { version = (3, 0,  0), latestMicroVersion = (3, 0,  1),  releaseDate = fromIsoString "2008-12-03", endOfSupport = fromIsoString "2009-06-27" }
-  , { version = (3, 1,  0), latestMicroVersion = (3, 1,  5),  releaseDate = fromIsoString "2009-06-27", endOfSupport = fromIsoString "2011-06-12" }
-  , { version = (3, 2,  0), latestMicroVersion = (3, 2,  6),  releaseDate = fromIsoString "2011-02-20", endOfSupport = fromIsoString "2013-05-13" }
-  , { version = (3, 3,  0), latestMicroVersion = (3, 3,  7),  releaseDate = fromIsoString "2012-09-29", endOfSupport = fromIsoString "2014-03-08" }
-  , { version = (3, 4,  0), latestMicroVersion = (3, 4,  10), releaseDate = fromIsoString "2014-03-16", endOfSupport = fromIsoString "2017-08-09" }
-  , { version = (3, 5,  0), latestMicroVersion = (3, 5,  10), releaseDate = fromIsoString "2015-09-13", endOfSupport = fromIsoString "2017-08-08" }
-  , { version = (3, 6,  0), latestMicroVersion = (3, 6,  15), releaseDate = fromIsoString "2016-12-23", endOfSupport = fromIsoString "2018-12-24" }
-  , { version = (3, 7,  0), latestMicroVersion = (3, 7,  16), releaseDate = fromIsoString "2018-06-27", endOfSupport = fromIsoString "2020-06-27" }
-  , { version = (3, 8,  0), latestMicroVersion = (3, 8,  16), releaseDate = fromIsoString "2019-10-14", endOfSupport = fromIsoString "2021-05-03" }
-  , { version = (3, 9,  0), latestMicroVersion = (3, 9,  16), releaseDate = fromIsoString "2020-10-05", endOfSupport = fromIsoString "2022-05-17" }
-  , { version = (3, 10, 0), latestMicroVersion = (3, 10, 10), releaseDate = fromIsoString "2021-10-04", endOfSupport = fromIsoString "2023-05-01" }
-  , { version = (3, 11, 0), latestMicroVersion = (3, 11, 2),  releaseDate = fromIsoString "2022-10-24", endOfSupport = fromIsoString "2024-05-01" }
-  , { version = (3, 12, 0), latestMicroVersion = (3, 12, 0),  releaseDate = fromIsoString "2023-10-02", endOfSupport = fromIsoString "2025-05-01" }
+distributions : List Distribution
+distributions =
+  [ { interpreter = CPython, version = (0, 9,  0), latestMicroVersion = (0, 9,  9),  releaseDate = fromCalendarDate 1991 Feb 20, endOfSupport = fromCalendarDate 1993 Jul 29, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 0,  0), latestMicroVersion = (1, 0,  4),  releaseDate = fromCalendarDate 1994 Jan 26, endOfSupport = fromCalendarDate 1994 Feb 15, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 1,  0), latestMicroVersion = (1, 1,  1),  releaseDate = fromCalendarDate 1994 Oct 11, endOfSupport = fromCalendarDate 1994 Nov 10, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 2,  0), latestMicroVersion = (1, 2,  0),  releaseDate = fromCalendarDate 1995 Apr 13, endOfSupport = fromCalendarDate 1995 Apr 13, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 3,  0), latestMicroVersion = (1, 3,  0),  releaseDate = fromCalendarDate 1995 Oct 13, endOfSupport = fromCalendarDate 1995 Oct 13, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 4,  0), latestMicroVersion = (1, 4,  0),  releaseDate = fromCalendarDate 1996 Oct 25, endOfSupport = fromCalendarDate 1996 Oct 25, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 5,  0), latestMicroVersion = (1, 5,  2),  releaseDate = fromCalendarDate 1998 Jan  3, endOfSupport = fromCalendarDate 1999 Apr 13, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (1, 6,  0), latestMicroVersion = (1, 6,  1),  releaseDate = fromCalendarDate 2000 Sep  5, endOfSupport = fromCalendarDate 2000 Sep  1, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 0,  0), latestMicroVersion = (2, 0,  1),  releaseDate = fromCalendarDate 2000 Oct 16, endOfSupport = fromCalendarDate 2001 Jun 22, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 1,  0), latestMicroVersion = (2, 1,  3),  releaseDate = fromCalendarDate 2001 Apr 15, endOfSupport = fromCalendarDate 2002 Apr  9, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 2,  0), latestMicroVersion = (2, 2,  3),  releaseDate = fromCalendarDate 2001 Dec 21, endOfSupport = fromCalendarDate 2003 May 30, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 3,  0), latestMicroVersion = (2, 3,  7),  releaseDate = fromCalendarDate 2003 Jun 29, endOfSupport = fromCalendarDate 2008 Mar 11, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 4,  0), latestMicroVersion = (2, 4,  6),  releaseDate = fromCalendarDate 2004 Nov 30, endOfSupport = fromCalendarDate 2008 Dec 19, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 5,  0), latestMicroVersion = (2, 5,  6),  releaseDate = fromCalendarDate 2006 Sep 19, endOfSupport = fromCalendarDate 2011 May 26, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 6,  0), latestMicroVersion = (2, 6,  9),  releaseDate = fromCalendarDate 2008 Oct  1, endOfSupport = fromCalendarDate 2010 Aug 24, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (2, 7,  0), latestMicroVersion = (2, 7,  18), releaseDate = fromCalendarDate 2010 Jul  3, endOfSupport = fromCalendarDate 2020 Jan  1, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 0,  0), latestMicroVersion = (3, 0,  1),  releaseDate = fromCalendarDate 2008 Dec  3, endOfSupport = fromCalendarDate 2009 Jun 27, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 1,  0), latestMicroVersion = (3, 1,  5),  releaseDate = fromCalendarDate 2009 Jun 27, endOfSupport = fromCalendarDate 2011 Jun 12, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 2,  0), latestMicroVersion = (3, 2,  6),  releaseDate = fromCalendarDate 2011 Feb 20, endOfSupport = fromCalendarDate 2013 May 13, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 3,  0), latestMicroVersion = (3, 3,  7),  releaseDate = fromCalendarDate 2012 Sep 29, endOfSupport = fromCalendarDate 2014 Mar  8, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 4,  0), latestMicroVersion = (3, 4,  10), releaseDate = fromCalendarDate 2014 Mar 16, endOfSupport = fromCalendarDate 2017 Aug  9, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 5,  0), latestMicroVersion = (3, 5,  10), releaseDate = fromCalendarDate 2015 Sep 13, endOfSupport = fromCalendarDate 2017 Aug  8, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 6,  0), latestMicroVersion = (3, 6,  15), releaseDate = fromCalendarDate 2016 Dec 23, endOfSupport = fromCalendarDate 2018 Dec 24, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 7,  0), latestMicroVersion = (3, 7,  16), releaseDate = fromCalendarDate 2018 Jun 27, endOfSupport = fromCalendarDate 2020 Jun 27, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 8,  0), latestMicroVersion = (3, 8,  16), releaseDate = fromCalendarDate 2019 Oct 14, endOfSupport = fromCalendarDate 2021 May  3, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 9,  0), latestMicroVersion = (3, 9,  16), releaseDate = fromCalendarDate 2020 Oct  5, endOfSupport = fromCalendarDate 2022 May 17, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 10, 0), latestMicroVersion = (3, 10, 10), releaseDate = fromCalendarDate 2021 Oct  4, endOfSupport = fromCalendarDate 2023 May  1, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 11, 0), latestMicroVersion = (3, 11, 2),  releaseDate = fromCalendarDate 2022 Oct 24, endOfSupport = fromCalendarDate 2024 May  1, dockerImage = Nothing, pyenvAvailable = False }
+  , { interpreter = CPython, version = (3, 12, 0), latestMicroVersion = (3, 12, 0),  releaseDate = fromCalendarDate 2023 Oct  2, endOfSupport = fromCalendarDate 2025 May  1, dockerImage = Nothing, pyenvAvailable = False }
   ]
 
 initialModel : Model
@@ -81,8 +100,7 @@ subscriptions _ = Sub.none
 toRetroPipUrl : Date -> String
 toRetroPipUrl d = "https://retropip.com/" ++ (format "yyyy/MM/dd" d) ++ "/simple"
 
-
-versionToString : PyVersion -> String
+versionToString : PythonVersion -> String
 versionToString version = 
   let
     (major, minor, patch) = version
@@ -92,7 +110,7 @@ versionToString version =
       |> String.Format.namedValue "minor" (String.fromInt minor)
       |> String.Format.namedValue "patch" (String.fromInt patch)
 
-dockerRecipe : Date -> PyVersion -> Html Msg
+dockerRecipe : Date -> PythonVersion -> Html Msg
 dockerRecipe date version =
   let
     template = """
@@ -123,8 +141,8 @@ viewRecipe model =
       (Ok d, Just v) -> dockerRecipe d v
       _ -> text ""
 
-intro : Html Msg
-intro = 
+introMessage : Html Msg
+introMessage = 
   div []
     [ h1 [ ] [ text "Welcome to retropip.com!" ]
     , p [] [ text "Your old Python projects don't have to die!" ]
@@ -152,10 +170,36 @@ workingDateSelector model =
             ] [  ]
     ]
 
+distributionOption : Model -> Distribution -> Html Msg
+distributionOption model dist =
+  let
+    released = not <| LT == (Date.compare (Result.withDefault model.today model.date) dist.releaseDate)
+    endOfLife = not <| LT == (Date.compare (Result.withDefault model.today model.date) dist.endOfSupport)
+    version = versionToString dist.version
+    label = "{{ name }} {{ version }} {{ note }}"
+      |> String.Format.namedValue "name" (interpreterToString dist.interpreter)
+      |> String.Format.namedValue "version" version
+      |> String.Format.namedValue "note" (
+        case (released, endOfLife) of
+          (False, False) -> " - Not yet released"
+          (True, True) -> " - End of life"
+          _ -> ""
+      )
+  in
+    option [ Attr.value version ] [ text label ]
+
+distributionSelector : Model -> Html Msg
+distributionSelector model =
+  div []
+    [ label [ Attr.for "pythonDistribution" ] [ text "Python version:" ]
+    , select [ ] (List.map (distributionOption model) distributions)
+    ]
+
 view : Model -> Html Msg
 view model =
   div []
-    [ intro
+    [ introMessage
     , workingDateSelector model
+    , distributionSelector model
     , viewRecipe model
     ]
