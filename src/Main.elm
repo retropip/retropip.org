@@ -1,31 +1,71 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, text, h1, ol, li, br, h2, p)
-import Html.Events exposing (onClick)
+import Date exposing (Date, Interval(..), Unit(..), fromIsoString, format)
+import Html exposing (Html, div, text, h1, ol, li, h2, p, input, pre)
+import Html.Attributes as Attr
+import Html.Events exposing (onInput)
+import String.Format
 
-main : Program () Int Msg
+type alias PyVersion = (Int, Int, Int)
+type alias Model = { date : Result String Date
+                   , version : Maybe PyVersion
+                   }
+
+initialModel : Model
+initialModel = { date = Err "No date selected", version = Just (2, 7, 0) }
+
+main : Program () Model Msg
 main =
   Browser.element { init = init, update = update, subscriptions = subscriptions, view = view }
 
-type Msg = Increment | Decrement
+type Msg = SetDate String
 
-init : () -> (Int, Cmd Msg)
-init _ = (0, Cmd.none)
+init : () -> (Model, Cmd Msg)
+init _ = (initialModel, Cmd.none)
 
-update : Msg -> number -> (number, Cmd Msg)
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Increment ->
-      (model + 1, Cmd.none)
+    SetDate d ->
+      ({ model | date = fromIsoString d }, Cmd.none)
 
-    Decrement ->
-      (model - 1, Cmd.none)
-
-subscriptions : Int -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions _ = Sub.none
 
-view : Int -> Html Msg
+toRetroPipUrl : Date -> String
+toRetroPipUrl d = "https://retropip.com/" ++ (format "yyyy/MM/dd" d) ++ "/simple"
+
+
+dockerRecipe : Model -> Html Msg
+dockerRecipe model =
+  let
+    {date, version} = model
+    template = """
+FROM python/{{ major }}.{{ minor }}.{{ patch }}
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+ENV PIP_INDEX_URL="{{ indexUrl }}"
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD [ "python", "./your-script.py" ]
+  """
+  in
+    case (date, version) of
+      ( Ok d, Just (major, minor, patch)) ->
+        pre [] [ text ( template
+                          |> String.Format.namedValue "indexUrl" (toRetroPipUrl d)
+                          |> String.Format.namedValue "major" (String.fromInt major)
+                          |> String.Format.namedValue "minor" (String.fromInt minor)
+                          |> String.Format.namedValue "patch" (String.fromInt patch))
+                ]
+      _ -> div [] []
+
+view : Model -> Html Msg
 view model =
   div []
     [ h1 [ ] [ text "Welcome to retropip.com!" ]
@@ -39,7 +79,8 @@ view model =
             , li [ ] [ text "Test your program and make any necessary updates or changes to ensure that it works as intended." ]
             , li [ ] [ text "Sit back and enjoy the peace of mind that comes with knowing your old Python program is running smoothly again!" ]
             ]
-    , button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (String.fromInt model) ]
-    , button [ onClick Increment ] [ text "+" ]
+    , input [ Attr.type_ "date"
+            , (onInput SetDate)
+            ] [  ]
+    , dockerRecipe model
     ]
