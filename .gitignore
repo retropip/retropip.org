@@ -1,3 +1,5 @@
 build/
 .spago/
 output/
+elm-stuff/
+site/elm.js
