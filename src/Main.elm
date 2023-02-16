@@ -123,8 +123,8 @@ viewRecipe model =
       (Ok d, Just v) -> dockerRecipe d v
       _ -> text ""
 
-view : Model -> Html Msg
-view model =
+intro : Html Msg
+intro = 
   div []
     [ h1 [ ] [ text "Welcome to retropip.com!" ]
     , p [] [ text "Your old Python projects don't have to die!" ]
@@ -137,7 +137,12 @@ view model =
             , li [ ] [ text "Test your program and make any necessary updates or changes to ensure that it works as intended." ]
             , li [ ] [ text "Sit back and enjoy the peace of mind that comes with knowing your old Python program is running smoothly again!" ]
             ]
-    , label [ Attr.for "lastWorkingDate" ] [ text "Last working date:" ]
+    ]
+
+workingDateSelector : Model -> Html Msg
+workingDateSelector model =
+  div []
+    [ label [ Attr.for "lastWorkingDate" ] [ text "Last working date:" ]
     , input [ Attr.type_ "date"
             , Attr.id "lastWorkingDate"
             , Attr.name "lastWorkingDate"
@@ -145,5 +150,12 @@ view model =
             , Attr.max <| toIsoString model.today
             , (onInput SetWorkingDate)
             ] [  ]
+    ]
+
+view : Model -> Html Msg
+view model =
+  div []
+    [ intro
+    , workingDateSelector model
     , viewRecipe model
     ]
