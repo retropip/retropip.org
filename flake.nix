@@ -8,6 +8,7 @@
     devShell.x86_64-linux = pkgs.stdenv.mkDerivation {
       name = "retropip.com";
       buildInputs = with pkgs; [
+        elmPackages.elm
         wrangler
       ];
     };
