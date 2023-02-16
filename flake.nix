@@ -9,6 +9,7 @@
       name = "retropip.com";
       buildInputs = with pkgs; [
         elmPackages.elm
+        entr
         wrangler
       ];
     };
