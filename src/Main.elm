@@ -21,20 +21,26 @@ type alias Model =
   , today : Date
   }
 
-type PythonInterpreter = CPython
+type PackageInstallationMethod
+  = Pip
+  | EasyInstall
+  | NoInstallationMethod
+
+type PythonInterpreter
+  = CPython
 
 interpreterToString : PythonInterpreter -> String
 interpreterToString _ = "CPython"
 
-type alias Distribution = 
-  { interpreter : PythonInterpreter
-  , version : PythonVersion
-  , latestMicroVersion : PythonVersion
-  , releaseDate : Date
-  , endOfSupport : Date
-  , dockerImage : Maybe String
-  , pyenvAvailable : Bool
-  }
+type alias Distribution
+  = { interpreter : PythonInterpreter
+    , version : PythonVersion
+    , latestMicroVersion : PythonVersion
+    , releaseDate : Date
+    , endOfSupport : Date
+    , dockerImage : Maybe String
+    , packageInstallationMethod : PackageInstallationMethod
+    }
 
 
 -- -- from pyenv install -l
@@ -836,35 +842,35 @@ type alias Distribution =
 -- from https://en.wikipedia.org/wiki/History_of_Python
 distributions : List Distribution
 distributions =
-  [ { interpreter = CPython, version = (0, 9,  0), latestMicroVersion = (0, 9,  9),  releaseDate = fromCalendarDate 1991 Feb 20, endOfSupport = fromCalendarDate 1993 Jul 29, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 0,  0), latestMicroVersion = (1, 0,  4),  releaseDate = fromCalendarDate 1994 Jan 26, endOfSupport = fromCalendarDate 1994 Feb 15, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 1,  0), latestMicroVersion = (1, 1,  1),  releaseDate = fromCalendarDate 1994 Oct 11, endOfSupport = fromCalendarDate 1994 Nov 10, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 2,  0), latestMicroVersion = (1, 2,  0),  releaseDate = fromCalendarDate 1995 Apr 13, endOfSupport = fromCalendarDate 1995 Apr 13, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 3,  0), latestMicroVersion = (1, 3,  0),  releaseDate = fromCalendarDate 1995 Oct 13, endOfSupport = fromCalendarDate 1995 Oct 13, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 4,  0), latestMicroVersion = (1, 4,  0),  releaseDate = fromCalendarDate 1996 Oct 25, endOfSupport = fromCalendarDate 1996 Oct 25, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 5,  0), latestMicroVersion = (1, 5,  2),  releaseDate = fromCalendarDate 1998 Jan  3, endOfSupport = fromCalendarDate 1999 Apr 13, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (1, 6,  0), latestMicroVersion = (1, 6,  1),  releaseDate = fromCalendarDate 2000 Sep  5, endOfSupport = fromCalendarDate 2000 Sep  1, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 0,  0), latestMicroVersion = (2, 0,  1),  releaseDate = fromCalendarDate 2000 Oct 16, endOfSupport = fromCalendarDate 2001 Jun 22, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 1,  0), latestMicroVersion = (2, 1,  3),  releaseDate = fromCalendarDate 2001 Apr 15, endOfSupport = fromCalendarDate 2002 Apr  9, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 2,  0), latestMicroVersion = (2, 2,  3),  releaseDate = fromCalendarDate 2001 Dec 21, endOfSupport = fromCalendarDate 2003 May 30, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 3,  0), latestMicroVersion = (2, 3,  7),  releaseDate = fromCalendarDate 2003 Jun 29, endOfSupport = fromCalendarDate 2008 Mar 11, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 4,  0), latestMicroVersion = (2, 4,  6),  releaseDate = fromCalendarDate 2004 Nov 30, endOfSupport = fromCalendarDate 2008 Dec 19, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 5,  0), latestMicroVersion = (2, 5,  6),  releaseDate = fromCalendarDate 2006 Sep 19, endOfSupport = fromCalendarDate 2011 May 26, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 6,  0), latestMicroVersion = (2, 6,  9),  releaseDate = fromCalendarDate 2008 Oct  1, endOfSupport = fromCalendarDate 2010 Aug 24, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (2, 7,  0), latestMicroVersion = (2, 7,  18), releaseDate = fromCalendarDate 2010 Jul  3, endOfSupport = fromCalendarDate 2020 Jan  1, dockerImage = Just "docker.io/library/python:2.7.18", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 0,  0), latestMicroVersion = (3, 0,  1),  releaseDate = fromCalendarDate 2008 Dec  3, endOfSupport = fromCalendarDate 2009 Jun 27, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 1,  0), latestMicroVersion = (3, 1,  5),  releaseDate = fromCalendarDate 2009 Jun 27, endOfSupport = fromCalendarDate 2011 Jun 12, dockerImage = Nothing, pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 2,  0), latestMicroVersion = (3, 2,  6),  releaseDate = fromCalendarDate 2011 Feb 20, endOfSupport = fromCalendarDate 2013 May 13, dockerImage = Just "docker.io/library/python:3.2.6", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 3,  0), latestMicroVersion = (3, 3,  7),  releaseDate = fromCalendarDate 2012 Sep 29, endOfSupport = fromCalendarDate 2014 Mar  8, dockerImage = Just "docker.io/library/python:3.3.7", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 4,  0), latestMicroVersion = (3, 4,  10), releaseDate = fromCalendarDate 2014 Mar 16, endOfSupport = fromCalendarDate 2017 Aug  9, dockerImage = Just "docker.io/library/python:3.4.10", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 5,  0), latestMicroVersion = (3, 5,  10), releaseDate = fromCalendarDate 2015 Sep 13, endOfSupport = fromCalendarDate 2017 Aug  8, dockerImage = Just "docker.io/library/python:3.5.10", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 6,  0), latestMicroVersion = (3, 6,  15), releaseDate = fromCalendarDate 2016 Dec 23, endOfSupport = fromCalendarDate 2018 Dec 24, dockerImage = Just "docker.io/library/python:3.6.15", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 7,  0), latestMicroVersion = (3, 7,  16), releaseDate = fromCalendarDate 2018 Jun 27, endOfSupport = fromCalendarDate 2020 Jun 27, dockerImage = Just "docker.io/library/python:3.7.16", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 8,  0), latestMicroVersion = (3, 8,  16), releaseDate = fromCalendarDate 2019 Oct 14, endOfSupport = fromCalendarDate 2021 May  3, dockerImage = Just "docker.io/library/python:3.8.16", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 9,  0), latestMicroVersion = (3, 9,  16), releaseDate = fromCalendarDate 2020 Oct  5, endOfSupport = fromCalendarDate 2022 May 17, dockerImage = Just "docker.io/library/python:3.9.16", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 10, 0), latestMicroVersion = (3, 10, 10), releaseDate = fromCalendarDate 2021 Oct  4, endOfSupport = fromCalendarDate 2023 May  1, dockerImage = Just "docker.io/library/python:3.10.10", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 11, 0), latestMicroVersion = (3, 11, 2),  releaseDate = fromCalendarDate 2022 Oct 24, endOfSupport = fromCalendarDate 2024 May  1, dockerImage = Just "docker.io/library/python:3.11.2", pyenvAvailable = False }
-  , { interpreter = CPython, version = (3, 12, 0), latestMicroVersion = (3, 12, 0),  releaseDate = fromCalendarDate 2023 Oct  2, endOfSupport = fromCalendarDate 2025 May  1, dockerImage = Nothing, pyenvAvailable = False }
+  [ { interpreter = CPython, version = (0, 9,  0), latestMicroVersion = (0, 9,  9),  releaseDate = fromCalendarDate 1991 Feb 20, endOfSupport = fromCalendarDate 1993 Jul 29, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 0,  0), latestMicroVersion = (1, 0,  4),  releaseDate = fromCalendarDate 1994 Jan 26, endOfSupport = fromCalendarDate 1994 Feb 15, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 1,  0), latestMicroVersion = (1, 1,  1),  releaseDate = fromCalendarDate 1994 Oct 11, endOfSupport = fromCalendarDate 1994 Nov 10, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 2,  0), latestMicroVersion = (1, 2,  0),  releaseDate = fromCalendarDate 1995 Apr 13, endOfSupport = fromCalendarDate 1995 Apr 13, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 3,  0), latestMicroVersion = (1, 3,  0),  releaseDate = fromCalendarDate 1995 Oct 13, endOfSupport = fromCalendarDate 1995 Oct 13, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 4,  0), latestMicroVersion = (1, 4,  0),  releaseDate = fromCalendarDate 1996 Oct 25, endOfSupport = fromCalendarDate 1996 Oct 25, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 5,  0), latestMicroVersion = (1, 5,  2),  releaseDate = fromCalendarDate 1998 Jan  3, endOfSupport = fromCalendarDate 1999 Apr 13, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (1, 6,  0), latestMicroVersion = (1, 6,  1),  releaseDate = fromCalendarDate 2000 Sep  5, endOfSupport = fromCalendarDate 2000 Sep  1, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (2, 0,  0), latestMicroVersion = (2, 0,  1),  releaseDate = fromCalendarDate 2000 Oct 16, endOfSupport = fromCalendarDate 2001 Jun 22, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (2, 1,  0), latestMicroVersion = (2, 1,  3),  releaseDate = fromCalendarDate 2001 Apr 15, endOfSupport = fromCalendarDate 2002 Apr  9, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (2, 2,  0), latestMicroVersion = (2, 2,  3),  releaseDate = fromCalendarDate 2001 Dec 21, endOfSupport = fromCalendarDate 2003 May 30, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (2, 3,  0), latestMicroVersion = (2, 3,  7),  releaseDate = fromCalendarDate 2003 Jun 29, endOfSupport = fromCalendarDate 2008 Mar 11, dockerImage = Nothing,                                 packageInstallationMethod = NoInstallationMethod }
+  , { interpreter = CPython, version = (2, 4,  0), latestMicroVersion = (2, 4,  6),  releaseDate = fromCalendarDate 2004 Nov 30, endOfSupport = fromCalendarDate 2008 Dec 19, dockerImage = Nothing,                                 packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (2, 5,  0), latestMicroVersion = (2, 5,  6),  releaseDate = fromCalendarDate 2006 Sep 19, endOfSupport = fromCalendarDate 2011 May 26, dockerImage = Just "oldpythonlenny",       packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (2, 6,  0), latestMicroVersion = (2, 6,  9),  releaseDate = fromCalendarDate 2008 Oct  1, endOfSupport = fromCalendarDate 2010 Aug 24, dockerImage = Nothing,                                 packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (2, 7,  0), latestMicroVersion = (2, 7,  18), releaseDate = fromCalendarDate 2010 Jul  3, endOfSupport = fromCalendarDate 2020 Jan  1, dockerImage = Just "docker.io/library/python:2.7.18",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 0,  0), latestMicroVersion = (3, 0,  1),  releaseDate = fromCalendarDate 2008 Dec  3, endOfSupport = fromCalendarDate 2009 Jun 27, dockerImage = Nothing,                                 packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (3, 1,  0), latestMicroVersion = (3, 1,  5),  releaseDate = fromCalendarDate 2009 Jun 27, endOfSupport = fromCalendarDate 2011 Jun 12, dockerImage = Nothing,                                 packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (3, 2,  0), latestMicroVersion = (3, 2,  6),  releaseDate = fromCalendarDate 2011 Feb 20, endOfSupport = fromCalendarDate 2013 May 13, dockerImage = Just "docker.io/library/python:3.2.6",   packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (3, 3,  0), latestMicroVersion = (3, 3,  7),  releaseDate = fromCalendarDate 2012 Sep 29, endOfSupport = fromCalendarDate 2014 Mar  8, dockerImage = Just "docker.io/library/python:3.3.7",   packageInstallationMethod = EasyInstall }
+  , { interpreter = CPython, version = (3, 4,  0), latestMicroVersion = (3, 4,  10), releaseDate = fromCalendarDate 2014 Mar 16, endOfSupport = fromCalendarDate 2017 Aug  9, dockerImage = Just "docker.io/library/python:3.4.10",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 5,  0), latestMicroVersion = (3, 5,  10), releaseDate = fromCalendarDate 2015 Sep 13, endOfSupport = fromCalendarDate 2017 Aug  8, dockerImage = Just "docker.io/library/python:3.5.10",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 6,  0), latestMicroVersion = (3, 6,  15), releaseDate = fromCalendarDate 2016 Dec 23, endOfSupport = fromCalendarDate 2018 Dec 24, dockerImage = Just "docker.io/library/python:3.6.15",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 7,  0), latestMicroVersion = (3, 7,  16), releaseDate = fromCalendarDate 2018 Jun 27, endOfSupport = fromCalendarDate 2020 Jun 27, dockerImage = Just "docker.io/library/python:3.7.16",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 8,  0), latestMicroVersion = (3, 8,  16), releaseDate = fromCalendarDate 2019 Oct 14, endOfSupport = fromCalendarDate 2021 May  3, dockerImage = Just "docker.io/library/python:3.8.16",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 9,  0), latestMicroVersion = (3, 9,  16), releaseDate = fromCalendarDate 2020 Oct  5, endOfSupport = fromCalendarDate 2022 May 17, dockerImage = Just "docker.io/library/python:3.9.16",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 10, 0), latestMicroVersion = (3, 10, 10), releaseDate = fromCalendarDate 2021 Oct  4, endOfSupport = fromCalendarDate 2023 May  1, dockerImage = Just "docker.io/library/python:3.10.10", packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 11, 0), latestMicroVersion = (3, 11, 2),  releaseDate = fromCalendarDate 2022 Oct 24, endOfSupport = fromCalendarDate 2024 May  1, dockerImage = Just "docker.io/library/python:3.11.2",  packageInstallationMethod = Pip }
+  , { interpreter = CPython, version = (3, 12, 0), latestMicroVersion = (3, 12, 0),  releaseDate = fromCalendarDate 2023 Oct  2, endOfSupport = fromCalendarDate 2025 May  1, dockerImage = Nothing,                                 packageInstallationMethod = Pip }
   ]
 
 selectDistribution : String -> Maybe Distribution
@@ -924,8 +930,30 @@ versionToString version =
       |> String.Format.namedValue "minor" (String.fromInt minor)
       |> String.Format.namedValue "patch" (String.fromInt patch)
 
-dockerRecipe : Date -> String -> Html Msg
-dockerRecipe date image =
+
+dockerEasyInstallRecipe : Date -> String -> Html Msg
+dockerEasyInstallRecipe date image =
+  let
+    template = """
+FROM {{ image }}
+
+WORKDIR /usr/src/app
+
+RUN echo -e "[easy_install]\\nindex_url = {{ indexUrl }}" > /root/.pydistutils.cfg
+RUN easy_install <your-dependencies>
+
+COPY . .
+
+CMD [ "python", "./your-script.py" ]
+  """
+  in
+    pre [] [ text ( template
+                      |> String.Format.namedValue "image" image
+                      |> String.Format.namedValue "indexUrl" (toRetroPipUrl date))
+            ]
+
+dockerPipRecipe : Date -> String -> Html Msg
+dockerPipRecipe date image =
   let
     template = """
 FROM {{ image }}
@@ -942,8 +970,8 @@ CMD [ "python", "./your-script.py" ]
   """
   in
     pre [] [ text ( template
-                      |> String.Format.namedValue "indexUrl" (toRetroPipUrl date)
-                      |> String.Format.namedValue "image" image)
+                      |> String.Format.namedValue "image" image
+                      |> String.Format.namedValue "indexUrl" (toRetroPipUrl date))
             ]
 
 
@@ -963,9 +991,10 @@ viewRecipe model =
   in
     case (date, distribution) of
       (Ok d, Just dist) ->
-        case dist.dockerImage of
-          Just image -> dockerRecipe d image
-          Nothing -> installRecipe d
+        case (dist.dockerImage, dist.packageInstallationMethod) of
+          (Just image, Pip) -> dockerPipRecipe d image
+          (Just image, EasyInstall) -> dockerEasyInstallRecipe d image
+          _ -> installRecipe d
       _ -> pre [ ] [ text "# Please, select a date and a Python version" ]
 
 introMessage : Html Msg
