@@ -229,6 +229,15 @@ subscriptions _ = Sub.none
 toRetroPipUrl : Date -> String
 toRetroPipUrl d = "https://retropip.com/" ++ (format "yyyy/MM/dd" d) ++ "/simple"
 
+seriesToString : PythonVersion -> String
+seriesToString version =
+  let
+    (major, minor, _) = version
+  in
+    "{{ major }}.{{ minor }}.x"
+      |> String.Format.namedValue "major" (String.fromInt major)
+      |> String.Format.namedValue "minor" (String.fromInt minor)
+
 versionToString : PythonVersion -> String
 versionToString version = 
   let
@@ -318,10 +327,11 @@ distributionOption model dist =
     hasDocker = ME.isJust dist.dockerImage
     released = not <| LT == (Date.compare (Result.withDefault model.today model.date) dist.releaseDate)
     endOfLife = not <| LT == (Date.compare (Result.withDefault model.today model.date) dist.endOfSupport)
+    series = seriesToString dist.version
     version = versionToString dist.version
-    label = "{{ name }} {{ version }} {{ note }} {{ docker }}"
+    label = "{{ name }} {{ series }} {{ note }} {{ docker }}"
       |> String.Format.namedValue "name" (interpreterToString dist.interpreter)
-      |> String.Format.namedValue "version" version
+      |> String.Format.namedValue "series" series
       |> String.Format.namedValue "note" (
         case (released, endOfLife) of
           (False, False) -> " - Not yet released"
