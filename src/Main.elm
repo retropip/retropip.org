@@ -261,6 +261,16 @@ CMD [ "python", "./your-script.py" ]
                       |> String.Format.namedValue "image" image)
             ]
 
+
+installRecipe : Date -> Html Msg
+installRecipe date =
+  let
+    command = "$ pip install --index-url {{ indexUrl }} -r requirements.txt"
+      |> String.Format.namedValue "indexUrl" (toRetroPipUrl date)
+  in
+    pre [] [ text command ]
+
+
 viewRecipe : Model -> Html Msg
 viewRecipe model =
   let
@@ -270,8 +280,8 @@ viewRecipe model =
       (Ok d, Just dist) ->
         case dist.dockerImage of
           Just image -> dockerRecipe d image
-          Nothing -> text ""
-      _ -> text ""
+          Nothing -> installRecipe d
+      _ -> pre [ ] [ text "# Please, select a date and a Python version" ]
 
 introMessage : Html Msg
 introMessage = 
