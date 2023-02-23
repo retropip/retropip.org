@@ -61,6 +61,7 @@ export async function onRequestGet(context) {
 }
 
 // to run locally and testing pruposes
+/*
 if (require.main === module) {
   date = new Date(process.argv[3]);
   fetch(jsonUrl(process.argv[2]))
@@ -76,3 +77,4 @@ if (require.main === module) {
       console.log(html(process.argv[2], links));
     });
 }
+*/
